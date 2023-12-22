@@ -5,12 +5,12 @@ trait ApiResponse {
     {
         return response()->json([
            'status' => 'success',
+            'message' => $message,
            'data' => $data,
-           'message' => $message,
         ]);
     }
 
-    protected function errorResponse($code,$message)
+    protected function errorResponse($code,$message): \Illuminate\Http\JsonResponse
     {
         return response()->json([
             'status' => 'failed',
