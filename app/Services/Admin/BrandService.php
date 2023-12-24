@@ -21,7 +21,7 @@ class BrandService
     public function addBrand(Request $request): \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model
     {
         $fileName = Carbon::now()->microsecond . '.' . $request->image->extension();
-        $request->image->storeAs('image-brands', $fileName, 'public');
+        $request->image->storeAs('images/brands', $fileName, 'public');
         return Brand::query()->create([
             'title' => $request->title,
             'image' => $fileName,
@@ -32,7 +32,7 @@ class BrandService
     {
         if ($request->has('image')) {
             $fileName = Carbon::now()->microsecond . '.' . $request->image->extension();
-            $request->image->storeAs('image-brands', $fileName, 'public');
+            $request->image->storeAs('images/brands', $fileName, 'public');
         }
         return $brand->update([
             'title' => $request->title,
@@ -43,5 +43,10 @@ class BrandService
     public function deleteBrand(Brand $brand): ?bool
     {
         return $brand->delete();
+    }
+
+    public function getProducts(Brand $brand): Brand
+    {
+        return $brand->load('products');
     }
 }

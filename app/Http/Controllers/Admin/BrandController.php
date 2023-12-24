@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\BrandEditRequest;
 use App\Http\Requests\Admin\BrandNewRequest;
 use App\Http\Resources\Admin\BrandResource;
+use App\Http\Resources\Admin\ProductResource;
 use App\Models\Brand;
 use App\Services\Admin\BrandService;
 use Illuminate\Http\Request;
@@ -49,5 +50,11 @@ class BrandController extends Controller
     {
         $this->service->deleteBrand($brand);
         return $this->successResponse(201, new BrandResource($brand), 'brand deleted successfully');
+    }
+
+    public function showProducts(Brand $brand): \Illuminate\Http\JsonResponse
+    {
+        $dataList = $this->service->getProducts($brand);
+        return $this->successResponse(201,new BrandResource($dataList),'product in brand');
     }
 }
