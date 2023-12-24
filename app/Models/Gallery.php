@@ -10,4 +10,9 @@ class Gallery extends Model
 {
     use HasFactory,SoftDeletes;
     protected $guarded = [];
+
+    public function product(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

@@ -26,4 +26,9 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
+    public function galleries(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Gallery::class);
+    }
+
 }

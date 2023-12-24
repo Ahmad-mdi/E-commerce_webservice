@@ -14,7 +14,7 @@ class ProductService {
     public function addProduct(Request $request): \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder
     {
         $fileName = Carbon::now()->microsecond.'.'.$request->image->extension();
-        $request->image->storeAs('imagePrimary-products',$fileName,'public');
+        $request->image->storeAs('images/products',$fileName,'public');
         return Product::query()->create([
             'category_id' => $request->category_id,
             'brand_id' => $request->brand_id,
@@ -36,7 +36,7 @@ class ProductService {
     {
         if ($request->has('image')) {
             $fileName = Carbon::now()->microsecond.'.'.$request->image->extension();
-            $request->image->storeAs('imagePrimary-products',$fileName,'public');
+            $request->image->storeAs('images/products',$fileName,'public');
         }
         return $product->update([
             'category_id' => $request->category_id,
