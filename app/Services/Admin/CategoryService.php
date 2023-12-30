@@ -47,4 +47,9 @@ class CategoryService
     {
         return $category->load('children');
     }
+
+    public function getProducts(Category $category): Category
+    {
+        return $category->load('products');
+    }
 }

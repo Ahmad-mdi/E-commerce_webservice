@@ -11,5 +11,6 @@ Route::get('/brand/{brand}/products',[BrandController::class,'showProducts']);
 Route::apiResource('/category',CategoryController::class);
 Route::get('/category/{category}/parent',[CategoryController::class,'parent']);
 Route::get('/category/{category}/children',[CategoryController::class,'children']);
+Route::get('/category/{category}/products',[CategoryController::class,'showProducts']);
 Route::apiResource('/product',ProductController::class);
 

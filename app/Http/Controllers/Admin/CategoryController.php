@@ -67,4 +67,10 @@ class CategoryController extends Controller
         $children = $this->service->showChildren($category);
         return $this->successResponse(201,new CategoryResource($children),'get children success');
     }
+
+    public function showProducts(Category $category): \Illuminate\Http\JsonResponse
+    {
+        $dataList = $this->service->getProducts($category);
+        return $this->successResponse(201,new CategoryResource($dataList),'get category in products');
+    }
 }
