@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\Admin;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class GalleryResource extends JsonResource
@@ -10,13 +9,15 @@ class GalleryResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @return array<string, mixed>
+     * @param  \Illuminate\Http\Request  $request
+     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
-    public function toArray(Request $request): array
+    public function toArray($request)
     {
         return [
-            'product_id' => $this->product->id,
-            'path' => $this->path,
+            'id' => $this->id,
+            'product_id' => $this->product_id,
+            'path' => url(env('PRODUCT_IMAGE_GALLERY_PATH').$this->path),
             'mime' => $this->mime,
         ];
     }

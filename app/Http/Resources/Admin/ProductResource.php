@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\Admin;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductResource extends JsonResource
@@ -10,19 +9,23 @@ class ProductResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @return array<string, mixed>
+     * @param  \Illuminate\Http\Request  $request
+     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
-    public function toArray(Request $request): array
+    public function toArray($request)
     {
-//        return parent::toArray($request);
         return [
-          'name' => $this->name,
-          'image' => url(env('saved_product_images').$this->image),
-          'category_id' => $this->category_id,
-          'brand_id' => $this->brand_id,
-          'price' => $this->price,
-          'quantity' => $this->quantity,
-          'galleries' => GalleryResource::collection($this->galleries),
+            'id' => $this->id,
+            'category_id' => $this->category_id,
+            'brand_id' => $this->brand_id,
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'image' => url(env('PRODUCT_IMAGE_UPLOAD_PATH').$this->image),
+            'price' => $this->price,
+            'delivery_amount' => $this->delivery_amount,
+            'description' => $this->description,
+            'quantity' => $this->quantity,
+            'galleries' => GalleryResource::collection($this->galleries),
         ];
     }
 }

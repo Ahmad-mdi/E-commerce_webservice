@@ -2,75 +2,101 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\ApiController;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\CategoryEditRequest;
-use App\Http\Requests\Admin\CategoryNewRequest;
-use App\Http\Resources\Admin\CategoryResource;
+use App\Models\Brand;
 use App\Models\Category;
-use App\Services\Admin\CategoryService;
+use App\Trait\ApiResponse;
 use Illuminate\Http\Request;
+use App\Http\Resources\Admin\CategoryResource;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 
-class CategoryController extends Controller
+class CategoryController extends ApiController
 {
-    private CategoryService $service;
-    public function __construct(CategoryService $service)
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
     {
-        $this->service = $service;
-    }
-
-    public function index(): \Illuminate\Http\JsonResponse
-    {
-        $list = $this->service->listOfCategories();
-        return $this->successResponse(200, CategoryResource::collection($list), 'listOfCategories');
-    }
-
-
-    public function store(CategoryNewRequest $request): \Illuminate\Http\JsonResponse
-    {
-        $created = $this->service->addCategory($request);
-        return $this->successResponse(200,
-            new CategoryResource($created), 'category added successfully');
-    }
-
-
-    public function show(Category $category): \Illuminate\Http\JsonResponse
-    {
-        $id = $this->service->getById($category);
-        return $this->successResponse(200, new CategoryResource($id));
-    }
-
-
-    public function update(CategoryEditRequest $request, Category $category): \Illuminate\Http\JsonResponse
-    {
-        if ($category->uniqueTitle($request)) {
-            return $this->errorResponse(422, 'the title has already been taken');
+        if(Gate::denies('read-category')){
+            return $this->errorResponse(403,'not permission user');
         }
-        $this->service->editCategory($request, $category);
-        return $this->successResponse(201, new CategoryResource($category), 'category edited successfully');
+        $category = Category::paginate(10);
+        return $this->successResponse(200,[
+            'categories' => CategoryResource::collection($category),
+            'links' => CategoryResource::collection($category)->response()->getData()->links,
+        ],'getCategories');
     }
 
-
-    public function destroy(Category $category): \Illuminate\Http\JsonResponse
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request, Category $category)
     {
-        $this->service->deleteCategory($category);
-        return $this->successResponse(201,new CategoryResource($category),'category deleted successfully');
+        $validate = Validator::make($request->all(),[
+            'title' => 'unique:categories,title|required',
+        ]);
+        if($validate->fails()){
+            return $this->errorResponse(422,$validate->messages());
+        }
+        $category->newCategory($request);
+        $dataResponse = $category->orderBy('id','desc')->first();
+        return $this->successResponse(200,new CategoryResource($dataResponse),'category created successfully');
     }
 
-    public function parent(Category $category): \Illuminate\Http\JsonResponse
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
     {
-        $parent = $this->service->showParent($category);
-        return $this->successResponse(201,new CategoryResource($parent),'get parent success');
+        //
     }
 
-    public function children(Category $category): \Illuminate\Http\JsonResponse
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
     {
-        $children = $this->service->showChildren($category);
-        return $this->successResponse(201,new CategoryResource($children),'get children success');
+        //
     }
 
-    public function showProducts(Category $category): \Illuminate\Http\JsonResponse
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
     {
-        $dataList = $this->service->getProducts($category);
-        return $this->successResponse(201,new CategoryResource($dataList),'get category in products');
+        //
+    }
+
+    public function parent(Category $category)
+    {
+        return $this->successResponse(200,new CategoryResource($category->load('parent')));
+    }
+    
+    public function children(Category $category)
+    {
+        return $this->successResponse(200,new CategoryResource($category->load('children')));
+    }
+
+    public function getProducts(Category $category)
+    {
+        return $this->successResponse(200,new CategoryResource($category->load('products')),'getProducts');
     }
 }
